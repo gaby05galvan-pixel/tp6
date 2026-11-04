@@ -1,25 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
 
-function App() {
+export default function App() {
+  const [miBlob, setMiBlob] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+  const [textoVisible, setTextoVisible] = useState("");
+
+  const hola = () => {
+    alert("Hola como estan!");
+  };
+
+  const handleCrear = () => {
+    const datos = "hola me llamo lucas tengo 21 años mi deporte es el fútbol";
+    const archivoBlob = new Blob([datos], { type: 'text/plain' });
+    setMiBlob(archivoBlob);
+    setTextoVisible(datos);
+  };
+
+  function handleDescargar() {
+    if (!miBlob) {
+      setMensaje("Crea el archivo primero.");
+      return;
+    }
+    const url = URL.createObjectURL(miBlob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = "texto-simple.txt";
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    URL.revokeObjectURL(url);
+    setMensaje("Archivo descargado.");
+  }
+
+  const handleSlice = async () => {
+    if (!miBlob) {
+      setMensaje("Crea el archivo primero.");
+      return;
+    }
+    const recorte = miBlob.slice(0, 19, 'text/plain');
+    const texto = await recorte.text();
+    setMensaje(`"${texto}"`);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h2>BLobs</h2>
+      <div>
+        <button onClick={handleCrear}>Crear archivo</button>
+        <button onClick={handleDescargar}>Descargar</button>
+        <button onClick={handleSlice}>Hacer Slice</button>
+        <button onClick={hola}>Boton Hola</button>
+      </div>
+      <p>{mensaje}</p>
+      {textoVisible && <pre>{textoVisible}</pre>}
     </div>
   );
 }
-
-export default App;
